@@ -18,12 +18,40 @@ client = genai.Client(api_key=api_key)
 # 오늘 날짜를 가져와서 프롬프트에 포함
 today = date.today().isoformat()  # YYYY-MM-DD
 
-# Make a loop that asks for the user's input and sends it to the model until the user types 'exit'
+# 현재 세션의 대화 기록 (메모리)
+conversation_history = []
+
+def show_recent_history(count=3):
+    """최근 대화 기록 표시"""
+    recent = conversation_history[-count:]
+    if recent:
+        print("\n📝 이번 세션의 질문들:")
+        for i, question in enumerate(recent, 1):
+            print(f"  {i}. {question[:60]}...")
+        print()
+
+print("🤖 Gemini API 채팅 시작 (종료하려면 'exit' 입력)\n")
+
+# 사용자 입력을 받고 모델에 전송하는 루프
 while True:
-    user_input = input("Enter your prompt (or type 'exit' to quit): ")
+    user_input = input("당신의 질문을 입력하세요: ").strip()
     if user_input.lower() == 'exit':
+        print("대화를 종료합니다.")
         break
+    
+    if not user_input:
+        print("⚠️  빈 입력입니다. 다시 시도해주세요.\n")
+        continue
+    
+    # 대화 기록에 저장
+    conversation_history.append(user_input)
+    
+    # API에 요청
     response = client.models.generate_content(
         model="gemini-2.5-flash", contents=user_input
     )
-    print(response.text)
+    
+    print(f"\n🤖 응답:\n{response.text}\n")
+    
+    # 최근 기록 표시
+    show_recent_history()
