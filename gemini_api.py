@@ -17,9 +17,13 @@ client = genai.Client(api_key=api_key)
 
 # 오늘 날짜를 가져와서 프롬프트에 포함
 today = date.today().isoformat()  # YYYY-MM-DD
-prompt = f"As of {today}, how many days until Christmas?"
 
-response = client.models.generate_content(
-    model="gemini-2.5-flash", contents=prompt
-)
-print(response.text)
+# Make a loop that asks for the user's input and sends it to the model until the user types 'exit'
+while True:
+    user_input = input("Enter your prompt (or type 'exit' to quit): ")
+    if user_input.lower() == 'exit':
+        break
+    response = client.models.generate_content(
+        model="gemini-2.5-flash", contents=user_input
+    )
+    print(response.text)
